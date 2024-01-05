@@ -1,0 +1,138 @@
+/* Default styles for all devices */
+body {
+    background-image: url('/static/images/main_page_bg.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #BDBCC8;
+    background-color: black;
+    
+        overflow: hidden;
+      
+}
+
+/* Media query for devices with a maximum width of 768 pixels (typical for mobile devices) */
+@media only screen and (max-width: 768px) {
+    body {
+        background-image: url('/static/images/main_page_bg_cropped.jpg');
+        /* Add additional styles for mobile view if needed */
+    }
+
+    .tile{
+            margin-top: 50px;
+
+    }
+}
+
+.disabled{
+    color: rgb(56, 56, 56);
+}
+
+.navbar {
+    background-color: rgba(20, 24, 39, 0.8);
+    color: #BDBCC8;
+    border-radius: 50px;
+    backdrop-filter: blur(10px);
+    animation: fadeInUp 0.5s ease;
+}
+
+.tileContainer{
+    margin-top: 25px;
+}
+/* tile */
+.tile {
+    margin-top: 25px;
+    background-color: rgba(11, 11, 11, 0.5); /* Transparent background */
+    backdrop-filter: blur(10px); /* Blurred background */
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: transform 0.3s ease; /* Add transition for smooth effect */
+    border-color: #202642;
+    border-style: solid;
+    animation: fadeInUp 0.5s ease;
+  }
+  
+  .icon {
+    margin-right: 20px;
+    color: #857891;
+  }
+  
+  .text {
+    font-size: 18px;
+  }
+
+  .tile:hover {
+    transform: scale(1.1); /* Adjust the scale factor as needed */
+    transition: transform 0.3s ease; /* Add a smooth transition effect */
+  }
+
+  /* Style for the meter container */
+  meter {
+    display: inline-block;
+    width: 150px;
+  }
+  /* Style for the meter bar */
+
+/* Style for the optimum (good) value */
+meter::-webkit-meter-optimum-value {
+    background-color: #36406B;
+    border-radius: 50px;
+}
+  
+  /* Style for the suboptimum (okay) value */
+  meter::-webkit-meter-suboptimum-value {
+    background-color: #36406B;
+    border-radius: 50px;
+}
+  
+  /* Style for the even less good (not so great) value */
+  meter::-webkit-meter-even-less-good-value {
+    background-color: #36406B;
+    border-radius: 50px;
+  }
+  
+
+  meter::-webkit-meter-bar {
+  background: #BDBCC8;
+  border: 1px solid #ccc;
+  border-radius: 50px;
+  height: 15px;
+}
+
+footer {
+    background-color: rgba(20, 24, 39, 0.8);
+    color: #BDBCC8;
+    border-top-right-radius: 20px;
+    border-top-left-radius: 20px;
+    backdrop-filter: blur(10px);
+    padding: 10px 0;
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    animation: fadeInUp 0.5s ease;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+
+  .text{
+    animation: fadeInUp 0.5s ease;
+  }
+
+
+  
