@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker ART Server</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"
+        integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+    <link rel="stylesheet" href="static/home.css">
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js"
+        integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/" crossorigin="anonymous"></script>
+    <!-- FontAwesome 6.2.0 CSS -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+        integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer ">
+    <!-- (Optional) Use CSS or JS implementation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/js/all.min.js"
+        integrity="sha512-naukR7I+Nk6gp7p5TMA4ycgfxaZBJ7MO5iC3Fp6ySQyKFHOGfpkSZkYVWV5R7u7cfAicxanwYQ5D1e17EfJcMA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+        <script src="/static/scripts/docker_endpoit.js"></script>
+
+        <style>
+            .lg{
+                font-size: 15px;
+            }
+
+            .tpcard{
+                background-color: rgba(20, 24, 39, 0.8);
+                color: #BDBCC8;
+                border-radius: 20px;
+                backdrop-filter: blur(10px);
+                transition: transform 0.5s ease; /* Add transition for smooth effect */
+                animation: fadeInUp 0.5s ease;
+
+            }
+
+            @keyframes fadeInUp {
+                from{
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+
+                to{
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .tpcard:hover{
+                transform: scale(1.1);
+                transition: transform 0.3s ease;
+                color: #FFFFFF
+            }
+
+            .container-button {
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: background-color 0.3s;
+        }
+
+        /* Style for the green button */
+        .container-button.running {
+            background-color: #36406B;
+            color: #BDBCC8;
+        }
+
+        /* Style for the red button */
+        .container-button.stopped {
+            background-color: #36406B;
+            color: #BDBCC8;
+        }
+
+        .delete-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #B8B0BF;
+    font-size: 1.5rem;
+    transition: color 0.3s;
+}
+
+.delete-button:hover {
+    color: #FFFFFF;
+}
+
+#add-container-card {
+    cursor: pointer;
+    height: 100%;
+}
+
+#add-container-card:hover {
+    transform: scale(1.05);
+}
+
+
+
+    @keyframes fade-out {
+        0% {
+            opacity: 1;
+        }
+        100% {
+            opacity: 0;
+        }
+    }
+
+/* 
+        button {
+            padding: 10px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        } */
+
+        </style>
+
+        <style>
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            display: none;
+            backdrop-filter: blur(5px);
+
+        }
+
+        .alert-box {
+            width: 300px;
+            padding: 50px;
+
+            background-color: rgba(20, 24, 39, 0.8);
+                color: #BDBCC8;
+                border-radius: 20px;
+                backdrop-filter: blur(10px);
+
+
+
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: slide-in 0.5s ease;
+            width: 50%;
+        }
+
+        .alert-box input
+
+        .alert-box h1 {
+            font-size: 24px;
+            color: #BDBCC8;
+            margin-bottom: 20px;
+        }
+
+        .alert-box p {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .alert-box .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 10px;
+            background-color: #36406B;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .alert-box .btn:hover {
+            background-color: #B8B0BF;
+        }
+
+        @keyframes slide-in {
+            0% {
+                opacity: 0;
+                transform: translateY(-20%);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .overlay.fade-out {
+        animation: fade-out 0.5s ease;
+    }
+
+    @keyframes fade-out {
+        0% {
+            opacity: 1;
+        }
+        100% {
+            opacity: 0;
+        }
+    }
+
+        </style>
+</head>
+
+<body style="margin-top: 86px;"> <!-- Add margin-top to account for the fixed navbar height -->
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#"><img class="logo" src="logo.png" alt=""><span
+                    class="neonlogo">DockerART</span></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fa fa-dashboard"
+                                aria-hidden="true"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" href="/docker"><i class="fa fa-cubes"
+                                aria-hidden="true"></i> Manage</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about.html"><i class="fa fa-server"
+                                aria-hidden="true"></i> Server</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="losi.html" class="nav-link" id="user">Login </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="overlay" id="overlay">
+        <div id="dockerForm" class="form-container alert-box">
+            <h1>Create Container</h1>
+            <label for="dockerImage">Docker Image:</label>
+            <select class="form-select" id="dockerImage" name="dockerImage">
+                <option value="default" selected disabled>Select Docker Image</option>
+            </select>
+
+            <label for="containerName">Container Name:</label>
+            <input type="text" class="form-control xs" id="containerName" name="containerName">
+
+            <label for="containerNetwork">Container Network:</label>
+            <select class="form-select" id="containerNetwork" name="containerNetwork">
+                <option value="default" selected disabled>Select Network Interface</option>
+            </select>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="runAsDaemon" name="runAsDaemon">
+                <label class="form-check-label" for="runAsDaemon">Run as Daemon</label>
+            </div>
+
+            <label for="maxMemory">Max Memory:</label>
+            <input type="text" class="form-control" id="maxMemory" name="maxMemory">
+
+            <label for="disksToConnect">Disks to Connect:</label>
+            <select class="form-select" id="disksToConnect" name="disksToConnect"></select>
+
+            <button class="btn btn-success" onclick="commit_and_create()">Submit</button>
+            <button class="btn btn-secondary" onclick="form_hide_create_docker_container()">Close</button>
+        </div>
+    </div>
+    <!-- 
+            <div class="overlay" id="overlay">
+        <div class="alert-box">
+            <h1>Logged Out</h1>
+            <p>You have been successfully logged out.</p>
+            <p></p>
+            <a href="index.html" class="btn">Go to Home</a>
+        </div>
+    </div>
+     -->
+
+    <!-- Container List -->
+    <div class="container mt-5">
+        <h1 class="mb-4">         <i class="fab fa-docker    "></i> Containers</h1>
+        <div id="containerList" class="row"></div>
+
+        <div class="col-md-4 mb-4" id="add-container-card">
+            <div class="card tpcard">
+                <div class="card-body text-center" onclick="form_show_create_docker_container()">
+                    <i class="fa-solid fa-feather-pointed fa-3x"></i>
+                    <p class="card-text">Add Container</p>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+  <!-- Footer -->
+  <footer>
+    <p><i class="fa-brands fa-osi"></i> 2024 DockerART</p>
+  </footer>
+</body>
+<!-- ... (previous HTML code) ... -->
+
+<!-- ... (previous HTML code) ... -->
+
+<script>
+
+function form_show_create_docker_container() {
+        document.getElementById('overlay').style.display = 'flex';
+        getRandomName();
+    }
+
+    function form_hide_create_docker_container() {
+        document.getElementById('overlay').style.display = 'none';
+    }
+
+    function getRandomName() {
+        fetch('/api/misc/random-name')
+            .then(response => response.json())
+            .then(data => {
+                // Use querySelector to select the first element with class 'xs'
+                const containerNameInput = document.querySelector('.xs');
+                containerNameInput.value = data['random_name'];
+            })
+            .catch(error => console.error('Error fetching random name:', error));
+    }
+</script>
+
+<!-- ... (remaining HTML code) ... -->
+
+
+<!-- ... (remaining HTML code) ... -->
+
+
+</html>

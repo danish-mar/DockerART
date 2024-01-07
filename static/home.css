@@ -17,6 +17,9 @@ body {
     body {
         background-image: url('/static/images/main_page_bg_cropped.jpg');
         /* Add additional styles for mobile view if needed */
+        margin: 0;
+        padding: 0;
+        display: flex;
     }
 
     .tile{
@@ -75,6 +78,10 @@ body {
     display: inline-block;
     width: 150px;
   }
+
+  meter::-webkit-meter-optimum-value, meter::-webkit-meter-suboptimum-value, meter::-webkit-meter-even-less-good-value {
+    transition: 0.5s width;
+}
   /* Style for the meter bar */
 
 /* Style for the optimum (good) value */
