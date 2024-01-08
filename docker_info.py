@@ -1,4 +1,8 @@
 import docker
+import json
+from flask import jsonify, Response
+
+# ... rest of your code ...
 
 
 #returns the running containers count
@@ -236,6 +240,14 @@ def get_docker_networks():
 
 #@params : network_id | gets the information on the provided contaner id
 def get_docker_network_info(network_id):
+
+
+    """
+    
+
+    """
+
+
     try:
         # Connect to the Docker daemon
         client = docker.from_env()
@@ -259,6 +271,98 @@ def get_docker_network_info(network_id):
 
     except docker.errors.APIError as e:
         return f"Error retrieving Docker network information: {str(e)}"
+
+
+import docker
+
+def create_docker_network(network_name, list_of_containers_to_attach=None):
+    """
+    Create a Docker network and optionally attach specified containers.
+
+    Parameters:
+    - network_name (str): Name of the Docker network to be created.
+    - list_of_containers_to_attach (list): List of container names to attach to the network (default is None).
+
+    Returns:
+    - str: The ID of the created network.
+    """
+
+    # Initialize the Docker client
+    client = docker.from_env()
+
+    # Create the Docker network
+    network = client.networks.create(network_name)
+
+    # Attach containers to the network if the list is provided
+    if list_of_containers_to_attach:
+        for container_name in list_of_containers_to_attach:
+            try:
+                container = client.containers.get(container_name)
+                network.connect(container)
+                print(f"Container '{container_name}' attached to network '{network_name}'.")
+            except docker.errors.NotFound:
+                print(f"Container '{container_name}' not found.")
+
+    return network.id
+
+
+
+import requests
+
+def search_docker_images(query):
+    # Docker Hub API URL for image search
+    api_url = f'https://hub.docker.com/v2/search/repositories/?query={query}&page_size=10'
+
+    try:
+        # Make a request to the Docker Hub API
+        response = requests.get(api_url)
+        response.raise_for_status()  # Raise an exception for unsuccessful HTTP responses
+
+        # Parse the JSON response
+        result = response.json()
+
+        # Extract image names from the response
+        image_names = [repo['repo_name'] for repo in result.get('results', [])]
+
+        return image_names
+
+    except requests.RequestException as e:
+        print(f"Error searching Docker images: {e}")
+        return None
+
+# ... (existing code)
+
+def pull_docker_image(image_name, tag='latest'):
+    try:
+        # Connect to the Docker daemon
+        client = docker.from_env()
+
+        # Use an event stream to get real-time logs during image pull
+        stream = client.api.pull(image_name, tag=tag, stream=True, decode=True)
+
+        # Iterate through the stream to get progress information
+        for event in stream:
+            if 'status' in event and 'id' in event:
+                # Send progress information to the client
+                progress_data = {'status': event['status'], 'id': event['id']}
+                yield f"data: {json.dumps(progress_data)}\n\n"
+
+        # Return a success message when the image pull is complete
+        yield f"data: {json.dumps({'status': 'success', 'message': f'Successfully pulled image: {image_name}:{tag}'})}\n\n"
+
+    except docker.errors.APIError as e:
+        # Return an error message if there is an issue with the image pull
+        yield f"data: {json.dumps({'status': 'error', 'message': f'Error pulling Docker image: {e}'})}\n\n"
+
+# ... (existing code)
+
+
+
+# Example: Pull the latest nginx image
+
+
+# Example: Search for images with the query 'nginx
+
 
 # Example usage:
 # Replace 'your_container_id' with the actual container ID you want to start

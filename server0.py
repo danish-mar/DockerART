@@ -1,11 +1,11 @@
 import os
 import subprocess
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, Response
 import docker
 from docker_info import *
 import psutil
 import randomname
-
+import json
 
 
 def get_cpu_and_memory_usage():
@@ -159,6 +159,67 @@ def delete_docker_container_route():
     else:
         # If 'containerID' is not provided in the JSON data, return an error response
         return jsonify({'status': 'error', 'message': 'Container ID not provided'}), 400
+
+
+
+@app.route('/api/docker-manage/createNetwork', methods=['POST'])
+def create_docker_network_route():
+    data = request.get_json()
+
+    # Extract parameters from the request data
+    network_name = data.get('network_name')
+    containers_to_attach = data.get('containers_to_attach', [])
+
+    # Call the create_docker_network function
+    network_id = create_docker_network(network_name, containers_to_attach)
+
+    return jsonify({"network_id": network_id, "message": "Docker network created successfully."})
+
+
+@app.route('/api/docker-manage/searchImage', methods=['GET'])
+def search_docker_images():
+    # Get the query parameter from the request
+    query = request.args.get('query')
+
+    if not query:
+        return jsonify({"error": "Query parameter is missing"}), 400
+
+    # Docker Hub API URL for image search
+    api_url = f'https://hub.docker.com/v2/search/repositories/?query={query}&page_size=10'
+
+    try:
+        # Make a request to the Docker Hub API
+        response = requests.get(api_url)
+        response.raise_for_status()  # Raise an exception for unsuccessful HTTP responses
+
+        # Parse the JSON response
+        result = response.json()
+
+        # Extract image names from the response
+        image_names = [repo['repo_name'] for repo in result.get('results', [])]
+
+        return jsonify({"images": image_names})
+
+    except requests.RequestException as e:
+        return jsonify({"error": f"Error searching Docker images: {e}"}), 500
+
+
+@app.route('/api/docker-manage/pullImage', methods=['GET'])
+def pull_docker_image_route():
+    # Get the image_name parameter from the query string
+    image_name = request.args.get('image_name')
+
+    # Check if 'image_name' is provided
+    if image_name:
+        tag = request.args.get('tag', 'latest')  # Default to 'latest' if 'tag' is not provided
+
+        # Use Response to stream SSE to the client
+        return Response(pull_docker_image(image_name, tag), content_type='text/event-stream')
+
+    else:
+        # If 'image_name' is not provided in the query string, return an error response
+        return jsonify({'status': 'error', 'message': 'Image name not provided'}), 400
+
 
 @app.route('/api/docker-manage/installedImages/list', methods=['GET'])
 def get_installed_images_route():
