@@ -1,6 +1,6 @@
 /* Default styles for all devices */
 body {
-    background-image: url('/static/images/main_page_bg.jpg');
+    background-image: url('/static/images/wallpaper0.jpg');
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
@@ -15,7 +15,7 @@ body {
 /* Media query for devices with a maximum width of 768 pixels (typical for mobile devices) */
 @media only screen and (max-width: 768px) {
     body {
-        background-image: url('/static/images/main_page_bg_cropped.jpg');
+        background-image: url('/static/images/wallpaper0_mobile.jpg');
         /* Add additional styles for mobile view if needed */
         margin: 0;
         padding: 0;
