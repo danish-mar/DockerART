@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - DockerART</title>
+</head>
+<body>
+
+    <h1>Login</h1>
+    <form id="loginForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required autocomplete="off" autofocus>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br>
+        <button type="submit">Login</button>
+    </form>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            // Fetch the login endpoint
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: document.getElementById('username').value,
+                    password: document.getElementById('password').value,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Redirect to the dashboard on successful login
+                    window.location.href = '/';
+                } else {
+                    // Display an alert for unsuccessful login
+                    alert('Invalid credentials');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Display an alert for general errors
+                alert('An error occurred. Please try again later.');
+            });
+        });
+    </script>
+
+</body>
+</html>

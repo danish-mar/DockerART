@@ -1,11 +1,53 @@
 import os
 import subprocess
-from flask import Flask, render_template, jsonify, request, Response
+from flask import Flask, render_template, jsonify, request, Response, redirect, url_for, session
+
+import random
 import docker
 from docker_info import *
 import psutil
 import randomname
 import json
+
+
+import json
+
+def load_config():
+    try:
+        with open('config/config.json', 'r') as config_file:
+            config_data = json.load(config_file)
+        return config_data
+    except FileNotFoundError:
+        print("Error: Config file not found.")
+        return None
+    except json.JSONDecodeError:
+        print("Error: Unable to decode JSON in config file.")
+        return None
+
+def get_username_password():
+    config_data = load_config()
+
+    if config_data:
+        username = config_data.get('username')
+        password = config_data.get('password')
+
+        if username and password:
+            return username, password
+        else:
+            print("Error: Username or password not found in config file.")
+            return None, None
+    else:
+        return None, None
+
+# Example usage:
+username, password = get_username_password()
+
+# if username and password:
+#     print(f"Username: {username}")
+#     print(f"Password: {password}")
+# else:
+#     print("Failed to retrieve username and password.")
+
 
 
 def get_cpu_and_memory_usage():
@@ -22,6 +64,11 @@ def get_cpu_and_memory_usage():
         return None, None
 
 app = Flask(__name__)
+app.secret_key = "kequeen"
+
+def check_session():
+    # Check if the session token is present in the session
+    return 'session_token' in session
 
 # Sample Docker and Server Information (replace with your actual data)
 def get_container_info():
@@ -44,7 +91,34 @@ def get_container_info():
 
     return container_info
 
+from flask import redirect, url_for, session
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'GET':
+        # Render the login page
+        return render_template('login.html')
+    elif request.method == 'POST':
+        data = request.get_json()
+
+        # Check if the username and password match (replace with your actual authentication logic)
+        if data.get('username') == username and data.get('password') == password:
+            # Set a session variable with a random session token
+            session['session_token'] = str(random.randint(1, 1000000))
+            session['user_id'] = 'keqing'  # Use a unique identifier for the user
+
+            return jsonify({'status': 'success'}), 200
+        else:
+            return jsonify({'status': 'error', 'message': 'Invalid credentials'}), 401
+
+
+
+
+@app.route("/logout", methods=['GET'])
+def logout():
+    session.clear()
+
+    return redirect(url_for('index'))
 # dashboard routes 
 
 @app.route('/')
@@ -52,8 +126,11 @@ def index():
     return render_template('index.html')
 
 @app.route('/docker')
-def server():
-    return render_template('docker.html')
+def docker():
+    if check_session():
+        return render_template('docker.html')
+    else:
+        return redirect(url_for('login'))
 
 @app.route('/api/docker-info', methods=['GET'])
 def get_docker_info():

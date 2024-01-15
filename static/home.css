@@ -7,18 +7,61 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #BDBCC8;
     background-color: black;
-    
+
+    margin-top: 80px;
         /*overflow: hidden;*/
       
 }
+
+
+
+/* CSS */
+@keyframes fadeIn {
+  from {
+      opacity: 0;
+      transform: translateY(-10px);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
+
+/* Apply the animation to the dropdown menu */
+.dropdown-menu{
+  background-color: #202642d9;
+  color: white;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.dropdown-item{
+  margin-left: 5px;
+  color: white;
+}
+
+/* Fade-out animation for the navbar */
+.xnavbar-collapse {
+  transition: opacity 0.3s ease-out;
+}
+
+/* Apply the animation only when the navbar is collapsing */
+.xnavbar-collapse.collapse {
+  opacity: 0;
+}
+
+/* Ensure smooth transition when the navbar is opening */
+.xnavbar-collapse.collapsing {
+  opacity: 1;
+}
+
+
 
 /* Media query for devices with a maximum width of 768 pixels (typical for mobile devices) */
 @media only screen and (max-width: 768px) {
     body {
         background-image: url('/static/images/wallpaper0_mobile.jpg');
         /* Add additional styles for mobile view if needed */
-        margin: 0;
-        padding: 0;
+
         display: flex;
     }
 
