@@ -1,0 +1,248 @@
+
+{%extends 'layout.html'%}
+
+{%block customHead%}
+
+
+{%endblock%}
+
+{%block title%}Containers ● DockerART{%endblock%}
+
+{%block menubar%}
+
+<div class="dropdown-menu xnavbar" aria-labelledby="manageDropdown">
+    <!-- <a class="dropdown-item" href="#"><i class="fa-solid fa-cube"></i> Container</a> -->
+    <a class="dropdown-item" href="#"><i class="fa-solid fa-floppy-disk"></i> Image</a>
+    <a class="dropdown-item" href="#"><i class="fa-solid fa-hard-drive"></i> Disks</a>
+    <a class="dropdown-item" href="#"><i class="fa-solid fa-network-wired"></i> Network</a>
+</div>
+
+{%endblock%}
+
+{%block content%}
+<!DOCTYPE html>
+<link rel="stylesheet" href="/static/manage.css">
+
+
+    <div class="overlay" id="overlay">
+   
+
+        <div id="dockerForm" class="form-container alert-box">
+            <i class="fa-solid fa-feather-pointed fa-3x"></i>
+            <h1>Create Container</h1>
+            <label for="dockerImage">Docker Image:</label>
+            <select class="form-select" id="dockerImage" name="dockerImage">
+                <option value="default" selected disabled>Select Docker Image</option>
+            </select>
+
+            <label for="containerName">Container Name:</label>
+            <input type="text" class="form-control xs" id="containerName" name="containerName">
+
+            <label for="containerNetwork">Container Network:</label>
+            <select class="form-select" id="containerNetwork" name="containerNetwork">
+                <option value="default" selected disabled>Select Network Interface</option>
+            </select>
+
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="runAsDaemon" name="runAsDaemon">
+                <label class="form-check-label" for="runAsDaemon">Run as Daemon</label>
+            </div>
+
+            <label for="maxMemory">Max Memory:</label>
+            <input type="text" class="form-control" id="maxMemory" name="maxMemory">
+
+            <label for="disksToConnect">Disks to Connect:</label>
+            <select class="form-select" id="disksToConnect" name="disksToConnect"></select>
+
+            <button class="btn btn-success" onclick="commit_and_create()">Submit</button>
+            <button class="btn btn-secondary" onclick="form_hide_create_docker_container()">Close</button>
+        </div>
+    </div>
+
+
+    <!-- <div class="overlay_pull" id="overlay_pull">
+        <div id="dockerFormPull" class="form-container alert-box">
+            <h1>Docker Image Pull</h1>
+            <label for="dockerImage">Docker Image:</label>
+            <input type="text" class="form-control" id="dockerImage" name="dockerImage" oninput="updateDropdown()">
+            <div id="imageDropdown"></div>
+    
+            <label for="containerName">Container Name:</label>
+            <input type="text" class="form-control xs" id="containerName" name="containerName">
+    
+            <div id="errorText" style="color: red;"></div>
+            <div id="successText" style="color: green;"></div>
+    
+            <div id="loader" style="display: none;">
+                <p>Loading...</p>
+            </div>
+    
+            <button class="btn btn-success" onclick="pullImage()">Pull!</button>
+            <button class="btn btn-secondary" onclick="form_show_pull_docker_image_hide()">Cancel</button>
+        </div>
+    </div> -->
+    
+    <div class="overlay_pull" id="overlay_pull">
+        <div id="dockerFormPull" class="form-container alert-box">
+            <i class="fa-solid fa-puzzle-piece fa-3x"></i>
+
+            <h1>Docker Image Pull</h1>
+            
+            <label for="dockerImage">Docker Image:</label>
+            <input type="text" class="form-control" id="dockerImagePull" name="dockerImagePull" oninput="updateDropdown()">
+    
+            <div id="imagePullDropdown"></div>
+    
+            <p id="errorMessage" class="error-message"></p>
+            <!-- Add this element to your HTML where you want to display the status line -->
+            <p id="statusLine" class="status-line"></p>
+
+            <p id="successMessage" class="success-message"></p>
+    
+            <div id="loader" class="loader"></div>
+    
+            <button class="btn btn-success" onclick="initiatePull()">Pull!</button>
+            <button class="btn btn-secondary" onclick="form_pull_docker_image_hide()">Cancel</button>
+        </div>
+    </div>
+
+    
+    <div class="overlay_create_network" id="overlay_create_network">
+        <div id="create_network_form" class="form-container alert-box">
+            <i class="fa-solid fa-network-wired fa-3x"></i>
+            <h1>Create New Network</h1>
+
+            <label for="networkName">Network Name:</label>
+            <input type="text" id="networkName" placeholder="Enter network name" class="form-control xsx">
+
+            <label>Containers to Attach:</label>
+            <div id="containerChecklistX"></div>
+
+            <p id="statusLines" class="status-lines"></p>
+
+            <button class="btn btn-success" onclick="createDockerNetwork()">Create Network</button>
+            <button class="btn btn-secondary" onclick="form_create_docker_network_hide()">Cancel</button>
+        </div>
+    </div>
+    <!-- 
+            <div class="overlay" id="overlay">
+        <div class="alert-box">
+            <h1>Logged Out</h1>
+            <p>You have been successfully logged out.</p>
+            <p></p>
+            <a href="index.html" class="btn">Go to Home</a>
+        </div>
+    </div>
+     -->
+
+    <!-- Container List -->
+    
+    <div class="container mt-5">
+        <h1 class="mb-4"><i class="fab fa-docker"></i> Containers</h1>
+        <div id="containerList" class="row"></div>
+        
+        <div class="col-md-4 mb-4" id="add-container-card"></div>
+    </div>
+    
+    <div class="container mt-5">
+            <h1 class="mb-6"><i class="fa-solid fa-gears"></i> Manage</h1>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card tpcard optioncard">
+                        <div class="card-body text-center" onclick="form_show_create_docker_container()">
+                            <i class="fa-solid fa-feather-pointed fa-3x"></i>
+                            <p class="card-text">Add Container</p>
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="col-md-6">
+                    <div class="card tpcard optioncard">
+                        <div class="card-body text-center" onclick="form_show_pull_docker_image()">
+                            <i class="fa-solid fa-puzzle-piece fa-3x"></i>
+                            <p class="card-text">Pull Image</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card tpcard optioncard">
+                    <div class="card-body text-center" onclick="form_show_create_network()">
+                        <i class="fa-solid fa-network-wired fa-3x"></i>
+                        
+                        <p class="card-text">Create Network</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+  <!-- Footer -->
+  <footer>
+    <p><i class="fa-brands fa-osi"></i> 2024 DockerART</p>
+  </footer>
+</body>
+<!-- ... (previous HTML code) ... -->
+
+<!-- ... (previous HTML code) ... -->
+
+<script>
+
+
+
+function form_show_create_docker_container() {
+        document.getElementById('overlay').style.display = 'flex';
+        getRandomName();
+    }
+
+
+    function form_show_pull_docker_image(){
+        document.getElementById('overlay_pull').style.display = 'flex';
+    }
+
+    function form_pull_docker_image_hide(){
+        document.getElementById('overlay_pull').style.display = 'none';
+    }
+
+
+    function form_show_create_network(){
+        document.getElementById('overlay_create_network').style.display = 'flex';
+        getRandomNameForNetwork();
+    }
+
+    function form_create_docker_network_hide(){
+        document.getElementById('overlay_create_network').style.display = 'none';
+    }
+
+    function form_hide_create_docker_container() {
+        document.getElementById('overlay').style.display = 'none';
+    }
+
+    function getRandomName() {
+        fetch('/api/misc/random-name')
+            .then(response => response.json())
+            .then(data => {
+                // Use querySelector to select the first element with class 'xs'
+                const containerNameInput = document.querySelector('.xs');
+                containerNameInput.value = data['random_name'];
+            })
+            .catch(error => console.error('Error fetching random name:', error));
+    }
+
+
+    function getRandomNameForNetwork() {
+        fetch('/api/misc/random-name')
+            .then(response => response.json())
+            .then(data => {
+                // Use querySelector to select the first element with class 'xs'
+                const containerNameInput = document.querySelector('.xsx');
+                containerNameInput.value = data['random_name'];
+            })
+            .catch(error => console.error('Error fetching random name:', error));
+    }
+</script>
+
+<script src="/static/scripts/docker_endpoit.js"></script>
+
+{%endblock%}

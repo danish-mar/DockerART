@@ -21,8 +21,14 @@
     integrity="sha512-naukR7I+Nk6gp7p5TMA4ycgfxaZBJ7MO5iC3Fp6ySQyKFHOGfpkSZkYVWV5R7u7cfAicxanwYQ5D1e17EfJcMA=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    <link rel="stylesheet" href="/static/home.css">
+    <!-- Include Font Awesome CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<!-- Use Font Awesome icon as favicon -->
+<link rel="icon" href="/static/icons/cubes-solid.svg" class="white-icon" type="image/svg+xml">
 
+    <link rel="stylesheet" href="/static/home.css">
+    <title>{%block title%}Default{%endblock%}</title>
+    {%block customHead%}{%endblock%}
 </head>
 <body>
     <!-- OLD Navbar -->
@@ -61,7 +67,7 @@
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
             <div class="container">
-                <a class="navbar-brand" href="#"><img class="logo" src="logo.png" alt=""><span
+                <a class="navbar-brand" href="#"><img class="logo" src="/static/icons/cubes-solid.svg" alt=""><span
                         class="neonlogo">DockerART</span></a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
                     aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,12 +84,14 @@
                                 aria-haspopup="true" aria-expanded="false">
                                 <i class="fa fa-cubes" aria-hidden="true"></i> Manage
                             </a>
+                            {%block menubar%}
                             <div class="dropdown-menu xnavbar" aria-labelledby="manageDropdown">
-                                <a class="dropdown-item" href="#"><i class="fa-solid fa-cube"></i> Container</a>
+                                <a class="dropdown-item" href="/container"><i class="fa-solid fa-cube"></i> Container</a>
                                 <a class="dropdown-item" href="#"><i class="fa-solid fa-floppy-disk"></i> Image</a>
                                 <a class="dropdown-item" href="#"><i class="fa-solid fa-hard-drive"></i> Disks</a>
                                 <a class="dropdown-item" href="#"><i class="fa-solid fa-network-wired"></i> Network</a>
                             </div>
+                            {%endblock%}
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="about.html"><i class="fa fa-server"

@@ -13,7 +13,12 @@ body {
       
 }
 
-
+.logo{
+  padding: 1px;
+  margin-right: 0.5cm;
+  height: 1cm;
+  width: 1cm;
+}
 
 /* CSS */
 @keyframes fadeIn {
@@ -27,15 +32,24 @@ body {
   }
 }
 
+
+/* Define the CSS class to change the color to white */
+.white-icon path {
+    fill: #ffffff; /* Set the fill color to white */
+}
+
+
 /* Apply the animation to the dropdown menu */
 .dropdown-menu{
+  padding: 10px;
   background-color: #202642d9;
   color: white;
   animation: fadeIn 0.3s ease-out;
+  border-radius: 30px;
 }
 
 .dropdown-item{
-  margin-left: 5px;
+  border-radius: 50px;
   color: white;
 }
 

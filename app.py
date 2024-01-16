@@ -4,6 +4,7 @@ from flask import Flask, render_template, jsonify, request, Response, redirect, 
 
 import random
 import docker
+
 from docker_info import *
 import psutil
 import randomname
@@ -70,26 +71,6 @@ def check_session():
     # Check if the session token is present in the session
     return 'session_token' in session
 
-# Sample Docker and Server Information (replace with your actual data)
-def get_container_info():
-    # Connect to the Docker daemon
-    client = docker.from_env()
-
-    # List all containers
-    containers = client.containers.list(all=True)
-
-    # Prepare container information
-    container_info = []
-    for container in containers:
-        info = {
-            'id' : container.id,
-            'Name': container.name,
-            'Image': container.image.tags[0],
-            'Running': container.status == 'running'
-        }
-        container_info.append(info)
-
-    return container_info
 
 from flask import redirect, url_for, session
 
@@ -125,10 +106,10 @@ def logout():
 def index():
     return render_template('index.html')
 
-@app.route('/docker')
+@app.route('/container')
 def docker():
     if check_session():
-        return render_template('docker.html')
+        return render_template('container.html')
     else:
         return redirect(url_for('login'))
 

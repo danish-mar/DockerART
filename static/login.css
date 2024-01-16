@@ -1,0 +1,12 @@
+body{
+    background-image: url('/static/images/main_page_bg.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #BDBCC8;
+}
+
+.loginForm{
+    border-style: dashed;
+}
