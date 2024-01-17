@@ -194,21 +194,38 @@ def create_docker_container_route():
     if 'container_image' in data and 'container_name' in data:
         container_name = data['container_name']
         container_image = data['container_image']
-        container_daemon = data['run_as_daemon']
+        container_daemon = data.get('run_as_daemon', False)  # Default to False if not provided
+        print("-----> ", container_daemon)
+
+        # Optional parameters
+        xcommand = data.get('command', None)
+        print("---->", xcommand)
+        auto_removal = data.get('auto_removal', False)  # Default to True if not provided
+        hostname = data.get('hostname', container_name)  # Default to containerName if not provided
+        memory_limit = data.get('memory_limit', None)  # Default to None if not provided
+        ports = data.get('ports', None)  # Default to None if not provided
+        volumes = data.get('volumes', None)  # Default to None if not provided
+
         if 'container_attach_to_network' in data:
             container_network = data['container_network']
-            result = create_docker_container(container_image, container_name, container_network,container_daemon)
+            result = create_docker_container(container_image, container_name, network=container_network, 
+                                            command=xcommand, auto_removal=auto_removal, hostname=hostname,
+                                            memory_limit=memory_limit, ports=ports, volumes=volumes, daemon=container_daemon)
+
         else:
-            result = create_docker_container(container_image, container_name, network=None)
-        
+            result = create_docker_container(container_image, container_name, network=container_network, 
+                                            command=xcommand, auto_removal=auto_removal, hostname=hostname,
+                                            memory_limit=memory_limit, ports=ports, volumes=volumes, daemon=container_daemon)
+
+
         if "created" and "started" in result:
             return jsonify({'status': 'Success', 'message': result})
         else:
-            return jsonify({'status':'error', 'message' : result})
-    
+            return jsonify({'status': 'error', 'message': result})
+
     else:
-        return jsonify({'status':'error', 'message':'Error in payload'}), 400
-        
+        return jsonify({'status': 'error', 'message': 'Error in payload'}), 400
+
 @app.route('/api/docker-manage/deletecontainer', methods=['POST'])
 def delete_docker_container_route():
     data = request.get_json()

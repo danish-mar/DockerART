@@ -1,0 +1,77 @@
+<div class="overlay_pull" id="overlay_pull">
+    <div id="dockerFormPull" class="form-container alert-box">
+        <i class="fa-solid fa-puzzle-piece fa-3x"></i>
+
+        <h1>Docker Image Pull</h1>
+        
+        <label for="dockerImage">Docker Image:</label>
+        <input type="text" class="form-control" id="dockerImagePull" name="dockerImagePull" oninput="updateDropdown()">
+
+        <div id="imagePullDropdown"></div>
+
+        <p id="errorMessage" class="error-message"></p>
+        <!-- Add this element to your HTML where you want to display the status line -->
+        <p id="statusLine" class="status-line"></p>
+
+        <p id="successMessage" class="success-message"></p>
+
+        <div id="loader" class="loader"></div>
+
+        <button class="btn btn-success" onclick="initiatePull()">Pull!</button>
+        <button class="btn btn-secondary" onclick="form_pull_docker_image_hide()">Cancel</button>
+    </div>
+</div>
+
+
+<div class="overlay_create_network" id="overlay_create_network">
+    <div id="create_network_form" class="form-container alert-box">
+        <i class="fa-solid fa-network-wired fa-3x"></i>
+        <h1>Create New Network</h1>
+
+        <label for="networkName">Network Name:</label>
+        <input type="text" id="networkName" placeholder="Enter network name" class="form-control xsx">
+
+        <label>Containers to Attach:</label>
+        <div id="containerChecklistX"></div>
+
+        <p id="statusLines" class="status-lines"></p>
+
+        <button class="btn btn-success" onclick="createDockerNetwork()">Create Network</button>
+        <button class="btn btn-secondary" onclick="form_create_docker_network_hide()">Cancel</button>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <h1 class="mb-6"><i class="fa-solid fa-gears"></i> Manage</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card tpcard optioncard">
+                <div class="card-body text-center" onclick="form_show_create_docker_container()">
+                    <i class="fa-solid fa-feather-pointed fa-3x"></i>
+                    <p class="card-text">Add Container</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card tpcard optioncard">
+                <div class="card-body text-center" onclick="form_show_pull_docker_image()">
+                    <i class="fa-solid fa-puzzle-piece fa-3x"></i>
+                    <p class="card-text">Pull Image</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card tpcard optioncard">
+            <div class="card-body text-center" onclick="form_show_create_network()">
+                <i class="fa-solid fa-network-wired fa-3x"></i>
+                
+                <p class="card-text">Create Network</p>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>

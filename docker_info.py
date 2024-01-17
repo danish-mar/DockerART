@@ -151,7 +151,10 @@ import docker
 
 
 #@params container_image, container_name, network | creates a docker container on the following arguments
-def create_docker_container(container_image, container_name, network):
+def create_docker_container(container_image, container_name, network=None,
+                            command=None, auto_removal=False, hostname=None, memory_limit=None,
+                            ports=None, volumes=None, daemon=False):
+
     try:
         # Connect to the Docker daemon
         client = docker.from_env()
@@ -161,19 +164,33 @@ def create_docker_container(container_image, container_name, network):
             'image': container_image,
             'name': container_name,
             'network': network,
+            'detach': daemon,
+
+            'auto_remove': auto_removal,
+            'hostname': hostname,
+            'mem_limit': memory_limit,
+            'ports': ports,
+            'volumes': volumes,
             # Add more configurations as needed
         }
+
+    
 
         # Create the Docker container
         container = client.containers.create(**container_config)
 
+        print("Command : ", command)
         # Start the created container
-        container.start()
+        container.run(command = command)
 
         return f"Container '{container_name}' created and started successfully."
 
     except docker.errors.APIError as e:
         return f"Error creating or starting container '{container_name}': {str(e)}"
+
+
+
+
 
 
 
