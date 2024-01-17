@@ -210,12 +210,12 @@ def create_docker_container_route():
             container_network = data['container_network']
             result = create_docker_container(container_image, container_name, network=container_network, 
                                             command=xcommand, auto_removal=auto_removal, hostname=hostname,
-                                            memory_limit=memory_limit, ports=ports, volumes=volumes, daemon=container_daemon)
+                                            memory_limit=memory_limit, ports=ports, volumes=volumes, daemon=container_daemon, startImmediate=True)
 
         else:
             result = create_docker_container(container_image, container_name, network=container_network, 
                                             command=xcommand, auto_removal=auto_removal, hostname=hostname,
-                                            memory_limit=memory_limit, ports=ports, volumes=volumes, daemon=container_daemon)
+                                            memory_limit=memory_limit, ports=ports, volumes=volumes, daemon=container_daemon, startImmediate=True)
 
 
         if "created" and "started" in result:
@@ -225,6 +225,8 @@ def create_docker_container_route():
 
     else:
         return jsonify({'status': 'error', 'message': 'Error in payload'}), 400
+
+
 
 @app.route('/api/docker-manage/deletecontainer', methods=['POST'])
 def delete_docker_container_route():

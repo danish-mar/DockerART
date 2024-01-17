@@ -128,6 +128,23 @@ def start_container(container_id):
     except docker.errors.NotFound:
         return(f"Container {container_id} not found.")
 
+def start_container(container_id,command):
+    try:
+        # Connect to the Docker daemon
+        client = docker.from_env()
+
+        # Get the container object
+        container = client.containers.get(container_id)
+
+        # Start the container
+        container.run(container, command)
+
+        return(f"Container {container_id} started successfully.")
+    except docker.errors.APIError as e:
+        return (f"Error starting container {container_id}: {e}")
+    except docker.errors.NotFound:
+        return(f"Container {container_id} not found.")
+
 #@params : container_ID | stops a container
 def stop_container(container_id):
     try:
@@ -153,7 +170,7 @@ import docker
 #@params container_image, container_name, network | creates a docker container on the following arguments
 def create_docker_container(container_image, container_name, network=None,
                             command=None, auto_removal=False, hostname=None, memory_limit=None,
-                            ports=None, volumes=None, daemon=False):
+                            ports=None, volumes=None, daemon=False, startImmediate=True):
 
     try:
         # Connect to the Docker daemon
@@ -165,7 +182,6 @@ def create_docker_container(container_image, container_name, network=None,
             'name': container_name,
             'network': network,
             'detach': daemon,
-
             'auto_remove': auto_removal,
             'hostname': hostname,
             'mem_limit': memory_limit,
@@ -174,20 +190,16 @@ def create_docker_container(container_image, container_name, network=None,
             # Add more configurations as needed
         }
 
-    
+        if startImmediate:
+            start_container(container_name, command)
 
         # Create the Docker container
         container = client.containers.create(**container_config)
-
-        print("Command : ", command)
-        # Start the created container
-        container.run(command = command)
 
         return f"Container '{container_name}' created and started successfully."
 
     except docker.errors.APIError as e:
         return f"Error creating or starting container '{container_name}': {str(e)}"
-
 
 
 
