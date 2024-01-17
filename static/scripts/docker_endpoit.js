@@ -390,10 +390,25 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(response => response.json())
         .then(data => {
             // Update the dropdown options
-            fillDropdown('containerNetwork', data);
+            fillDropdown('containerNetwork', data.map(network => network.name));
         })
         .catch(error => console.error('Error fetching Docker networks:', error));
 });
+
+function fillDropdown(dropdownId, options) {
+    const dropdown = document.getElementById(dropdownId);
+
+    // Clear existing options
+    dropdown.innerHTML = '';
+
+    // Add new options
+    options.forEach(option => {
+        const optionElement = document.createElement('option');
+        optionElement.value = option;
+        optionElement.textContent = option;
+        dropdown.appendChild(optionElement);
+    });
+}
 
     document.addEventListener('DOMContentLoaded', function () {
         // Fetch Docker images from Flask server

@@ -157,7 +157,7 @@ def start_container_route():
     # Check if the 'containerID' key exists in the JSON data
     if 'containerID' in data:
         container_id = data['containerID']
-        result = start_container(container_id)
+        result = start_container(container_id,command=None)
 
         # Return a response, for example, a JSON response
         if("successfully" in result):
@@ -208,12 +208,12 @@ def create_docker_container_route():
 
         if 'container_attach_to_network' in data:
             container_network = data['container_network']
-            result = create_docker_container(container_image, container_name, network=container_network, 
+            result = create_docker_container_gen2(container_image, container_name, network=container_network, 
                                             command=xcommand, auto_removal=auto_removal, hostname=hostname,
                                             memory_limit=memory_limit, ports=ports, volumes=volumes, daemon=container_daemon, startImmediate=True)
 
         else:
-            result = create_docker_container(container_image, container_name, network=container_network, 
+            result = create_docker_container_gen2(container_image, container_name, network=container_network, 
                                             command=xcommand, auto_removal=auto_removal, hostname=hostname,
                                             memory_limit=memory_limit, ports=ports, volumes=volumes, daemon=container_daemon, startImmediate=True)
 
