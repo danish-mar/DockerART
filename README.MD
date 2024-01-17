@@ -6,7 +6,7 @@ This repository is a super cute Flask web application designed for managing Dock
 
 1. **Dashboard:**
    - Accessible at the root (`/`) and `/docker`.
-   - Provides a delightful and informative user interface for the virtual family. 💖
+   - Provides a delightful and informative user interface 💖
 
 2. **Docker Information:**
    - `/api/docker-info` endpoint delivers essential Docker details:
