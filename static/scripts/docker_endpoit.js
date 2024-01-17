@@ -329,17 +329,27 @@ function commit_and_create() {
     const containerNetwork = document.getElementById('containerNetwork').value;
     const runAsDaemon = document.getElementById('runAsDaemon').checked;
     const maxMemory = document.getElementById('maxMemory').value;
-    const disksToConnect = document.getElementById('disksToConnect').value;
+    const disksToConnect = document.getElementById('disksToConnect').value; 
+    const command = document.getElementById('command').value;  // Add this line for the command input
+    const autoRemoval = document.getElementById('autoRemoval').checked;  // Add this line for the autoRemoval input
+    const hostname = document.getElementById('hostname').value;  // Add this line for the hostname input
+    const ports = document.getElementById('ports').value;  // Add this line for the ports input
+    const volumes = document.getElementById('volumes').value;  // Add this line for the volumes input
 
     // Prepare data for the POST request
     const data = {
         container_image: dockerImage,
         container_name: containerName,
         container_network: containerNetwork,
-        container_attach_to_network: containerNetwork !== 'None', // Check if a network is selected
+        container_attach_to_network: containerNetwork !== 'None',
         run_as_daemon: runAsDaemon,
         max_memory: maxMemory,
         disks_to_connect: disksToConnect,
+        command: command,
+        auto_removal: autoRemoval,
+        hostname: hostname,
+        ports: ports,
+        volumes: volumes,
     };
 
     // Make a POST request to the Flask server
@@ -380,10 +390,25 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(response => response.json())
         .then(data => {
             // Update the dropdown options
-            fillDropdown('containerNetwork', data);
+            fillDropdown('containerNetwork', data.map(network => network.name));
         })
         .catch(error => console.error('Error fetching Docker networks:', error));
 });
+
+function fillDropdown(dropdownId, options) {
+    const dropdown = document.getElementById(dropdownId);
+
+    // Clear existing options
+    dropdown.innerHTML = '';
+
+    // Add new options
+    options.forEach(option => {
+        const optionElement = document.createElement('option');
+        optionElement.value = option;
+        optionElement.textContent = option;
+        dropdown.appendChild(optionElement);
+    });
+}
 
     document.addEventListener('DOMContentLoaded', function () {
         // Fetch Docker images from Flask server

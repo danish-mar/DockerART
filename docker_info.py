@@ -1,7 +1,7 @@
 import docker
 import json
 from flask import jsonify, Response
-
+import requests
 # ... rest of your code ...
 
 # Sample Docker and Server Information (replace with your actual data)
@@ -61,7 +61,7 @@ def get_installed_images_list_dropdown():
     images = client.images.list()
     return [image.tags[0] for image in images if image.tags]
 
-    return installed_images
+    return images
 
 def get_docker_networks_list_dropdown():
     try:
@@ -111,7 +111,7 @@ def print_container_info():
 
 
 #@params : container_ID | starts a container
-def start_container(container_id):
+def start_container(container_id,command=None):
     try:
         # Connect to the Docker daemon
         client = docker.from_env()
@@ -120,13 +120,33 @@ def start_container(container_id):
         container = client.containers.get(container_id)
 
         # Start the container
-        container.start()
+        if command:
+            container.run(command)
+        else:
+            container.start()
 
         return(f"Container {container_id} started successfully.")
     except docker.errors.APIError as e:
         return (f"Error starting container {container_id}: {e}")
     except docker.errors.NotFound:
         return(f"Container {container_id} not found.")
+
+# def start_container(container_id,command):
+#     try:
+#         # Connect to the Docker daemon
+#         client = docker.from_env()
+
+#         # Get the container object
+#         container = client.containers.get(container_id)
+
+#         # Start the container
+#         container.run(container, command)
+
+#         return(f"Container {container_id} started successfully.")
+#     except docker.errors.APIError as e:
+#         return (f"Error starting container {container_id}: {e}")
+#     except docker.errors.NotFound:
+#         return(f"Container {container_id} not found.")
 
 #@params : container_ID | stops a container
 def stop_container(container_id):
@@ -151,7 +171,10 @@ import docker
 
 
 #@params container_image, container_name, network | creates a docker container on the following arguments
-def create_docker_container(container_image, container_name, network):
+def create_docker_container_gen2(container_image, container_name, network=None,
+                            command=None, auto_removal=False, hostname=None, memory_limit=None,
+                            ports=None, volumes=None, daemon=False, startImmediate=True):
+
     try:
         # Connect to the Docker daemon
         client = docker.from_env()
@@ -161,19 +184,28 @@ def create_docker_container(container_image, container_name, network):
             'image': container_image,
             'name': container_name,
             'network': network,
+            'detach': daemon,
+            'auto_remove': auto_removal,
+            'hostname': hostname,
+            'mem_limit': memory_limit,
+            'ports': ports,
+            'volumes': volumes,
             # Add more configurations as needed
         }
 
+        if startImmediate:
+            start_container(container_name,command)
+
         # Create the Docker container
         container = client.containers.create(**container_config)
-
-        # Start the created container
-        container.start()
 
         return f"Container '{container_name}' created and started successfully."
 
     except docker.errors.APIError as e:
         return f"Error creating or starting container '{container_name}': {str(e)}"
+
+
+
 
 
 
@@ -293,7 +325,7 @@ def get_docker_network_info(network_id):
         return f"Error retrieving Docker network information: {str(e)}"
 
 
-import docker
+
 
 def create_docker_network(network_name, list_of_containers_to_attach=None):
     """
@@ -327,7 +359,7 @@ def create_docker_network(network_name, list_of_containers_to_attach=None):
 
 
 
-import requests
+
 
 def search_docker_images(query):
     # Docker Hub API URL for image search

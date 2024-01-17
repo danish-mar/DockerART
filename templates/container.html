@@ -22,42 +22,82 @@
 {%block content%}
 <!DOCTYPE html>
 <link rel="stylesheet" href="/static/manage.css">
+<link rel="stylesheet" href="/static/container.css">
 
 
-    <div class="overlay" id="overlay">
-   
+<div class="overlay" id="overlay">
+    <div id="dockerForm" class="form-container alert-box">
+        <i class="fa-solid fa-feather-pointed fa-3x"></i>
+        <h1>Create Container</h1>
+        <label for="dockerImage">Docker Image:</label>
+        <select class="form-select" id="dockerImage" name="dockerImage">
+            <option value="default" selected disabled>Select Docker Image</option>
+            <!-- Add your Docker Image options here -->
+        </select>
 
-        <div id="dockerForm" class="form-container alert-box">
-            <i class="fa-solid fa-feather-pointed fa-3x"></i>
-            <h1>Create Container</h1>
-            <label for="dockerImage">Docker Image:</label>
-            <select class="form-select" id="dockerImage" name="dockerImage">
-                <option value="default" selected disabled>Select Docker Image</option>
-            </select>
+        <label for="containerName">Container Name:</label>
+        <input type="text" class="form-control xs" id="containerName" name="containerName">
 
-            <label for="containerName">Container Name:</label>
-            <input type="text" class="form-control xs" id="containerName" name="containerName">
+        <label for="containerNetwork">Container Network:</label>
+        <select class="form-select" id="containerNetwork" name="containerNetwork">
+            <option value="default" selected disabled>Select Network Interface</option>
+            <!-- Add your Network Interface options here -->
+        </select>
 
-            <label for="containerNetwork">Container Network:</label>
-            <select class="form-select" id="containerNetwork" name="containerNetwork">
-                <option value="default" selected disabled>Select Network Interface</option>
-            </select>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="runAsDaemon" name="runAsDaemon">
+            <label class="form-check-label" for="runAsDaemon">Run as Daemon</label>
+        </div>
 
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="runAsDaemon" name="runAsDaemon">
-                <label class="form-check-label" for="runAsDaemon">Run as Daemon</label>
-            </div>
-
+        <!-- Advanced Options Section -->
+        <div id="advancedOptionsSection" style="display: none;">
+            <h2>Advanced Options</h2>
+        
             <label for="maxMemory">Max Memory:</label>
             <input type="text" class="form-control" id="maxMemory" name="maxMemory">
-
+        
             <label for="disksToConnect">Disks to Connect:</label>
             <select class="form-select" id="disksToConnect" name="disksToConnect"></select>
-
-            <button class="btn btn-success" onclick="commit_and_create()">Submit</button>
-            <button class="btn btn-secondary" onclick="form_hide_create_docker_container()">Close</button>
+        
+            <label for="command">Command To Run:</label>
+            <input type="text" class="form-control" placeholder="/bin/bash" name="command" id="command">
+        
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="autoRemoval" name="autoRemoval">
+                <label class="form-check-label" for="autoRemoval">AutoRemove?</label>
+            </div>
+        
+            <label for="hostname">Hostname:</label>
+            <input type="text" class="form-control" id="hostname" name="hostname" placeholder="hostname">
+        
+            <label for="ports">Ports:</label>
+            <input type="text" class="form-control" id="ports" name="ports" placeholder="e.g., 8080:80, 3000:3000">
+        
+            <label for="volumes">Volumes:</label>
+            <input type="text" class="form-control" id="volumes" name="volumes" placeholder="e.g., /host/path:/container/path">
+        
+            <!-- Add more advanced options here -->
         </div>
+        
+
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="showAdvancedOptions" name="showAdvancedOptions">
+            <label class="form-check-label" for="showAdvancedOptions">Show Advanced Options</label>
+        </div>
+
+        <button class="btn btn-success" onclick="commit_and_create()">Submit</button>
+        <button class="btn btn-secondary" onclick="form_hide_create_docker_container()">Close</button>
     </div>
+</div>
+
+<script>
+    // Toggle visibility of advanced options based on the state of the checkbox
+    document.getElementById('showAdvancedOptions').addEventListener('change', function() {
+        const advancedOptionsSection = document.getElementById('advancedOptionsSection');
+        advancedOptionsSection.style.display = this.checked ? 'block' : 'none';
+    });
+</script>
+
 
 
     <!-- <div class="overlay_pull" id="overlay_pull">
@@ -82,48 +122,7 @@
         </div>
     </div> -->
     
-    <div class="overlay_pull" id="overlay_pull">
-        <div id="dockerFormPull" class="form-container alert-box">
-            <i class="fa-solid fa-puzzle-piece fa-3x"></i>
 
-            <h1>Docker Image Pull</h1>
-            
-            <label for="dockerImage">Docker Image:</label>
-            <input type="text" class="form-control" id="dockerImagePull" name="dockerImagePull" oninput="updateDropdown()">
-    
-            <div id="imagePullDropdown"></div>
-    
-            <p id="errorMessage" class="error-message"></p>
-            <!-- Add this element to your HTML where you want to display the status line -->
-            <p id="statusLine" class="status-line"></p>
-
-            <p id="successMessage" class="success-message"></p>
-    
-            <div id="loader" class="loader"></div>
-    
-            <button class="btn btn-success" onclick="initiatePull()">Pull!</button>
-            <button class="btn btn-secondary" onclick="form_pull_docker_image_hide()">Cancel</button>
-        </div>
-    </div>
-
-    
-    <div class="overlay_create_network" id="overlay_create_network">
-        <div id="create_network_form" class="form-container alert-box">
-            <i class="fa-solid fa-network-wired fa-3x"></i>
-            <h1>Create New Network</h1>
-
-            <label for="networkName">Network Name:</label>
-            <input type="text" id="networkName" placeholder="Enter network name" class="form-control xsx">
-
-            <label>Containers to Attach:</label>
-            <div id="containerChecklistX"></div>
-
-            <p id="statusLines" class="status-lines"></p>
-
-            <button class="btn btn-success" onclick="createDockerNetwork()">Create Network</button>
-            <button class="btn btn-secondary" onclick="form_create_docker_network_hide()">Cancel</button>
-        </div>
-    </div>
     <!-- 
             <div class="overlay" id="overlay">
         <div class="alert-box">
@@ -140,44 +139,19 @@
     <div class="container mt-5">
         <h1 class="mb-4"><i class="fab fa-docker"></i> Containers</h1>
         <div id="containerList" class="row"></div>
-        
+            <div class="col-md-4 mb-4 add-container-outer">
+                <div class="card tpcard add-container">
+                    <div class="card-body text-center" onclick="form_show_create_docker_container()">
+                        <i class="fa-solid fa-plus"></i>
+                        <h5>Create Container</h5>
+                    </div>
+                </div>
+            </div>
         <div class="col-md-4 mb-4" id="add-container-card"></div>
     </div>
     
-    <div class="container mt-5">
-            <h1 class="mb-6"><i class="fa-solid fa-gears"></i> Manage</h1>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="card tpcard optioncard">
-                        <div class="card-body text-center" onclick="form_show_create_docker_container()">
-                            <i class="fa-solid fa-feather-pointed fa-3x"></i>
-                            <p class="card-text">Add Container</p>
-                        </div>
-                    </div>
-                </div>
-        
-                <div class="col-md-6">
-                    <div class="card tpcard optioncard">
-                        <div class="card-body text-center" onclick="form_show_pull_docker_image()">
-                            <i class="fa-solid fa-puzzle-piece fa-3x"></i>
-                            <p class="card-text">Pull Image</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    
 
-            <div class="col-md-6">
-                <div class="card tpcard optioncard">
-                    <div class="card-body text-center" onclick="form_show_create_network()">
-                        <i class="fa-solid fa-network-wired fa-3x"></i>
-                        
-                        <p class="card-text">Create Network</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        </div>
-    </div>
   <!-- Footer -->
   <footer>
     <p><i class="fa-brands fa-osi"></i> 2024 DockerART</p>
