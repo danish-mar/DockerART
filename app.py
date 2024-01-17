@@ -113,6 +113,14 @@ def docker():
     else:
         return redirect(url_for('login'))
 
+
+@app.route('/images')
+def imageRoute():
+    if check_session():
+        return render_template('images.html')
+    else:
+        return redirect(url_for('login'))
+
 @app.route('/api/docker-info', methods=['GET'])
 def get_docker_info():
     docker_info = {
