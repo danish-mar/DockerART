@@ -1,5 +1,4 @@
 {
-    "http_server_port" : "600",
     "flask_port" : "601",
     "username" : "keqing",
     "password" : "keqing"
