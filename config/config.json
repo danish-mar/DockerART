@@ -1,5 +1,1 @@
-{
-    "flask_port" : "601",
-    "username" : "keqing",
-    "password" : "keqing"
-}
+{"flask_port": "50", "username": "keqing", "password": "keqing"}
