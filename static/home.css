@@ -199,4 +199,30 @@ footer {
   }
 
 
+/* Custom scrollbar style */
+::-webkit-scrollbar {
+  width: 8px; /* Adjust the width as needed */
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background-color: #141827;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background-color: #36406B;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #BDBCC8;
+}
+
+/* Button */
+::-webkit-scrollbar-button {
+  display: none; /* Hide scrollbar buttons (if any) */
+}
+
+
   

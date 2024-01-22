@@ -2,6 +2,8 @@ import docker
 import json
 from flask import jsonify, Response
 import requests
+from datetime import datetime
+
 # ... rest of your code ...
 
 # Sample Docker and Server Information (replace with your actual data)
@@ -406,12 +408,64 @@ def pull_docker_image(image_name, tag='latest'):
         # Return an error message if there is an issue with the image pull
         yield f"data: {json.dumps({'status': 'error', 'message': f'Error pulling Docker image: {e}'})}\n\n"
 
-# ... (existing code)
+
+#image page functions 
+
+def convert_size_bytes(size_bytes):
+    # Convert bytes to megabytes (MB)
+    size_mb = size_bytes / (1024 * 1024)
+
+    # Choose appropriate unit (MB, GB, TB, etc.)
+    for unit in ['MB', 'GB', 'TB', 'PB']:
+        if size_mb < 1024:
+            return f"{size_mb:.2f} {unit}"
+        size_mb /= 1024
+
+def format_date(created_date):
+    # Split the date string into date and time
+    date_part, time_part = created_date.split('T')
+    
+    # Convert Docker date string (date) to datetime object
+    date_object = datetime.strptime(date_part, "%Y-%m-%d")
+    
+    # Format the date as DD-MM-YYYY
+    formatted_date = date_object.strftime("%d-%m-%Y")
+    return formatted_date
+
+
+def list_installed_images_detailed():
+    try:
+        client = docker.from_env()
+        images = client.images.list()
+
+        images_info = [{'index': idx,
+                        'id': image.short_id[7:],
+                        'name': image.tags[0],
+                        'size': convert_size_bytes(image.attrs['Size']),
+                        'tags': image.tags,
+                        'release_date': format_date(image.attrs['Created'])} for idx, image in enumerate(images)]
+
+        return images_info
+    except Exception as e:
+        return {'error': str(e)}
+
+def delete_image(image_id):
+    try:
+        client = docker.from_env()
+        image = client.images.get(image_id)
+        image.remove()
+        return f"Image with ID {image_id} successfully deleted."
+    except docker.errors.ImageNotFound:
+        return f"Image with ID {image_id} not found."
+    except docker.errors.APIError as e:
+        return {'error': str(e)}
+
 
 
 
 # Example: Pull the latest nginx image
 
+#print(list_installed_images_detailed())
 
 # Example: Search for images with the query 'nginx
 

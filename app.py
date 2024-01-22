@@ -322,5 +322,32 @@ def get_random_name():
     name = randomname.generate()
     return jsonify({"random_name": name})
 
+
+#list images  
+@app.route('/api/docker-manage/images/list', methods=['GET'])
+def get_images():
+    images_info = list_installed_images_detailed()
+    return jsonify(images_info)
+
+@app.route('/api/docker-manage/images/delete', methods=['DELETE'])
+def delete_image_route():
+    if check_session():
+        try:
+            data = request.get_json()
+            image_id = data.get('image_id')
+
+            if image_id:
+                result = delete_image(image_id)
+                return jsonify(result)
+            else:
+                return jsonify({'error': 'Missing image_id in the request body'}), 400
+
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+    else:
+        return redirect(url_for('login'))
+
+
+
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0")
