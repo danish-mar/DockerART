@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"
@@ -29,6 +31,24 @@
     <link rel="stylesheet" href="/static/home.css">
     <title>{%block title%}Default{%endblock%}</title>
     {%block customHead%}{%endblock%}
+
+
+
+      <!-- Include jQuery library -->
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <!-- Include toastr from CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+  
+  <!-- Include SweetAlert2 CSS and JS files -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js"></script>
+  
+  
+    <!-- Include Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+
 </head>
 <body>
     <!-- OLD Navbar -->
@@ -89,7 +109,7 @@
                                 <a class="dropdown-item" href="/container"><i class="fa-solid fa-cube"></i> Container</a>
                                 <a class="dropdown-item" href="/images"><i class="fa-solid fa-floppy-disk"></i> Image</a>
                                 <a class="dropdown-item" href="#"><i class="fa-solid fa-hard-drive"></i> Disks</a>
-                                <a class="dropdown-item" href="#"><i class="fa-solid fa-network-wired"></i> Network</a>
+                                <a class="dropdown-item" href="/networks"><i class="fa-solid fa-network-wired"></i> Network</a>
                             </div>
                             {%endblock%}
                         </li>

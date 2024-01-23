@@ -356,6 +356,83 @@ def create_docker_network(network_name, list_of_containers_to_attach=None):
                 print(f"Container '{container_name}' not found.")
 
     return network.id
+def create_docker_network(network_name, ipam_config=None, internal=False, driver='bridge'):
+    """
+    Create a new Docker network.
+
+    Parameters:
+    - network_name: Name of the new network.
+    - ipam_config: IPAM configuration (subnet, gateway, etc.). Default is None.
+    - internal: Whether the network is internal (True or False). Default is False.
+    - driver: Network driver to be used. Default is 'bridge'.
+
+    Returns:
+    - Dictionary containing information about the created network.
+    """
+    try:
+        client = docker.from_env()
+
+        ipam_config = ipam_config or {
+            'Driver': 'default',
+            'Options': {},
+            'Config': []
+        }
+
+        network = client.networks.create(
+            name=network_name,
+            internal=internal,
+            driver=driver,
+            ipam=ipam_config
+        )
+
+        return {
+            'network_id': network.id,
+            'network_name': network.name,
+            'internal': network.attrs['Internal'],
+            'driver': network.attrs['Driver'],
+            'ipam_config': network.attrs['IPAM']
+        }
+
+    except docker.errors.APIError as e:
+        return {'error': f'Docker API error: {e}'}
+
+def connect_containers_to_network(container_names, network_name):
+    """
+    Connect containers to a Docker network.
+
+    Parameters:
+    - container_names: List of container names to be connected.
+    - network_name: Name of the network to connect the containers.
+
+    Returns:
+    - List of dictionaries containing information about each connection.
+    """
+    try:
+        client = docker.from_env()
+
+        connections = []
+        network = client.networks.get(network_name)
+
+        for container_name in container_names:
+            try:
+                container = client.containers.get(container_name)
+                network.connect(container)
+                connections.append({
+                    'container_name': container_name,
+                    'network_name': network_name,
+                    'status': 'connected'
+                })
+            except docker.errors.NotFound:
+                connections.append({
+                    'container_name': container_name,
+                    'network_name': network_name,
+                    'status': 'container not found'
+                })
+
+        return connections
+
+    except docker.errors.APIError as e:
+        return [{'error': f'Docker API error: {e}'} for _ in container_names]
 
 
 
@@ -405,6 +482,126 @@ def pull_docker_image(image_name, tag='latest'):
     except docker.errors.APIError as e:
         # Return an error message if there is an issue with the image pull
         yield f"data: {json.dumps({'status': 'error', 'message': f'Error pulling Docker image: {e}'})}\n\n"
+
+
+
+
+def get_docker_network_details():
+    try:
+        client = docker.from_env()
+
+        networks = client.networks.list()
+
+        network_details_list = []
+
+        for network in networks:
+            connected_containers = get_connected_containers(network.id)
+            network_details = {
+                'network_name': network.name,
+                'network_id': network.id[:12],  # Shortened network ID
+                'connected_containers': connected_containers,
+                'driver': network.attrs['Driver'],
+            }
+
+            network_details_list.append(network_details)
+
+        return network_details_list
+
+    except docker.errors.APIError as e:
+        # Handle Docker API errors
+        return {'error': f'Docker API error: {e}'}
+
+def get_connected_containers(network_id):
+    try:
+        client = docker.from_env()
+
+        network = client.networks.get(network_id)
+        return [container.name for container in network.containers]
+
+    except docker.errors.APIError as e:
+        # Handle Docker API errors
+        return []
+
+def get_network_details(network_id):
+    try:
+        client = docker.from_env()
+        network = client.networks.get(network_id)
+
+        network_details = {
+            'network_name': network.name,
+            'network_subnet': None,
+            'network_gateway': None,
+            'connected_containers': [],
+        }
+
+        if 'IPAM' in network.attrs:
+            network_details['network_subnet'] = network.attrs['IPAM']['Config'][0]['Subnet']
+            network_details['network_gateway'] = network.attrs['IPAM']['Config'][0]['Gateway']
+
+        for container_id, container_info in network.attrs['Containers'].items():
+            container_details = {
+                'container_name': client.containers.get(container_id).name,
+                'mac_address': container_info['MacAddress'],
+                'ipv4_address': container_info['IPv4Address'] if 'IPv4Address' in container_info else None,
+                'ipv6_address': container_info['IPv6Address'] if 'IPv6Address' in container_info else None,
+            }
+            network_details['connected_containers'].append(container_details)
+
+        return network_details
+
+    except docker.errors.APIError as e:
+        # Handle Docker API errors
+        return {'error': f'Docker API error: {e}'}
+
+# Example usage:
+# network_id = '32202c87c156'  # Replace with the short network ID you want to query
+# result = get_network_details(network_id)
+# print(result)
+
+
+def delete_docker_network(network_id):
+    try:
+        client = docker.from_env()
+        network = client.networks.get(network_id)
+        network.remove()
+        return {'status': 'success', 'message': f'Network {network_id} deleted successfully'}
+    except docker.errors.APIError as e:
+        return {'status': 'error', 'message': f'Docker API error: {e}'}
+
+
+def disconnect_container_from_network(container_name, network_name):
+    try:
+        client = docker.from_env()
+        container = client.containers.get(container_name)
+
+        # Disconnect the container from the network
+        client.api.disconnect_container_from_network(container.id, network_name)
+
+        return {'status': 'success'}
+
+    except docker.errors.APIError as e:
+        # Handle Docker API errors
+        return {'error': f'Docker API error: {e}'}
+
+
+
+def connect_container_to_network(container_name, network_name):
+    try:
+        client = docker.from_env()
+        container = client.containers.get(container_name)
+
+        # Connect the container to the network
+        client.api.connect_container_to_network(container.id, network_name)
+
+        return {'status': 'success'}
+
+    except docker.errors.APIError as e:
+        # Handle Docker API errors
+        return {'error': f'Docker API error: {e}'}
+
+# Example usage:
+# disconnect_container_from_network('your_container_name', 'your_network_name')
+
 
 # ... (existing code)
 

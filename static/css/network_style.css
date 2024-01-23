@@ -1,0 +1,113 @@
+
+/* Custom modal styles */
+.modal-content {
+  background-color: #141827; /* Set background color */
+  color: #BDBCC8; /* Set text color */
+}
+
+.modal-header {
+  background-color: #36406B; /* Set header background color */
+  color: #BDBCC8; /* Set header text color */
+}
+
+.modal-footer {
+  background-color: #36406B; /* Set footer background color */
+  color: #BDBCC8; /* Set footer text color */
+}
+
+/* Customize close button color */
+.btn-close {
+  color: #BDBCC8;
+}
+
+
+  /* Custom modal styles */
+.modal-content {
+background-color: #141827; /* Set background color */
+color: #BDBCC8; /* Set text color */
+border: 1px solid #BDBCC8; /* Add border */
+}
+
+.modal-header {
+background-color: #36406B; /* Set header background color */
+color: #BDBCC8; /* Set header text color */
+border-bottom: 1px solid #BDBCC8; /* Add border to header */
+}
+
+.modal-footer {
+background-color: #36406B; /* Set footer background color */
+color: #BDBCC8; /* Set footer text color */
+border-top: 1px solid #BDBCC8; /* Add border to footer */
+}
+
+/* Customize close button color */
+.btn-close {
+color: #BDBCC8;
+}
+
+/* Set table styles */
+.table {
+color: white; /* Set font color */
+}
+
+
+
+.btn-primary {
+background-color: #36406B; /* Set primary button background color */
+border-color: #36406B; /* Set primary button border color */
+}
+
+.btn-danger {
+background-color: #BDBCC8; /* Set danger button background color */
+border-color: #BDBCC8; /* Set danger button border color */
+}
+
+.btn-secondary {
+background-color: #857891; /* Set secondary button background color */
+border-color: #857891; /* Set secondary button border color */
+}
+
+.btn-link {
+color: #857891; /* Set link button color */
+}
+
+
+/* Add this CSS to your stylesheet or in a <style> tag in your HTML */
+
+/* Apply the color palette to SweetAlert2 */
+.swal2-popup {
+background-color: #141827;
+color: #BDBCC8;
+}
+
+.swal2-title {
+color: #857891;
+}
+
+.swal2-content {
+color: #BDBCC8;
+}
+
+.swal2-confirm {
+background-color: #36406B;
+color: #BDBCC8;
+}
+
+.swal2-cancel {
+background-color: #857891;
+color: #BDBCC8;
+}
+
+/* Create a transparent, blurred background */
+.swal2-container {
+background: rgba(0, 0, 0, 0.5); /* Adjust the alpha value for transparency */
+backdrop-filter: blur(10px); /* Adjust the blur intensity as needed */
+}
+
+/* Adjust the styling for the toast */
+.toast {
+background-color: #36406B;
+color: #BDBCC8;
+}
+
+
