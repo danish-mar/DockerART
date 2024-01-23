@@ -62,6 +62,27 @@
     border: 1px solid #BDBCC8; /* Add border to the table */
   }
 
+
+  .btn-primary {
+    background-color: #36406B; /* Set primary button background color */
+    border-color: #36406B; /* Set primary button border color */
+  }
+
+  .btn-danger {
+    background-color: #BDBCC8; /* Set danger button background color */
+    border-color: #BDBCC8; /* Set danger button border color */
+  }
+
+  .btn-secondary {
+    background-color: #857891; /* Set secondary button background color */
+    border-color: #857891; /* Set secondary button border color */
+  }
+
+  .btn-link {
+    color: #857891; /* Set link button color */
+  }
+
+
   </style>
   
 {% endblock %}
@@ -137,26 +158,33 @@
       });
     }
 
-    // JavaScript for dynamically populating network inspection modal
-    function populateNetworkInspectModal(networkDetails) {
-      const modalContent = document.getElementById('networkInspectContent');
-      modalContent.innerHTML = `
-        <p><strong>Network Name:</strong> ${networkDetails.network_name}</p>
-        <p><strong>Network Subnet:</strong> ${networkDetails.network_subnet}</p>
-        <p><strong>Network Gateway:</strong> ${networkDetails.network_gateway}</p>
-        <p><strong>Connected Containers:</strong></p>
-        <ul>
-          ${networkDetails.connected_containers.map(container => `
-            <li>
-              <strong>Container Name:</strong> ${container.container_name}<br>
-              <strong>MAC Address:</strong> ${container.mac_address}<br>
-              <strong>IPv4 Address:</strong> ${container.ipv4_address || 'None'}<br>
-              <strong>IPv6 Address:</strong> ${container.ipv6_address || 'None'}
-            </li>
-          `).join('')}
-        </ul>
-      `;
-    }
+// JavaScript for dynamically populating network inspection modal
+function populateNetworkInspectModal(networkDetails) {
+    const modalContent = document.getElementById('networkInspectContent');
+    modalContent.innerHTML = `
+      <p><strong><i class="fa-solid fa-pencil"></i> Network Name:</strong> ${networkDetails.network_name}</p>
+      <p><strong><i class="fa-solid fa-subscript"></i> Network Subnet:</strong> ${networkDetails.network_subnet}</p>
+      <p><strong><i class="fa-solid fa-route"></i> Network Gateway:</strong> ${networkDetails.network_gateway}</p>
+      <p><strong><i class="fa-solid fa-cubes-stacked"></i> Connected Containers:</strong></p>
+      <ul>
+        ${networkDetails.connected_containers.map(container => `
+          <li>
+            <strong>Container Name:</strong> ${container.container_name}<br>
+
+            <strong>MAC Address:</strong> ${container.mac_address}<br>
+            <strong>IPv4 Address:</strong> ${container.ipv4_address || 'None'}<br>
+            <strong>IPv6 Address:</strong> ${container.ipv6_address || 'None'}
+          </li>
+
+          <button class="btn btn-danger" onclick="disconnectContainer('${container.container_name}', '${networkDetails.network_name}')">
+            <i class="fa-solid fa-unlink"></i> Unlink
+          </button><br>
+          <hr>
+        `).join('')}
+      </ul>
+    `;
+  }
+  
 
     // Function to inspect a network
     function inspectNetwork(networkId) {
