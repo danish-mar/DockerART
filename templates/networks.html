@@ -1,0 +1,115 @@
+{% extends 'layout.html' %}
+
+{% block customHead %}
+  <script src="/static/scripts/network_endpoint.js"></script>
+  
+  <link rel="stylesheet" href="/static/css/network_style.css">
+{% endblock %}
+
+{% block title %}Network ● DockerART{% endblock %}
+
+{% block menubar %}
+  <div class="dropdown-menu xnavbar" aria-labelledby="manageDropdown">
+    <a class="dropdown-item" href="/container"><i class="fa-solid fa-cube"></i> Container</a>
+    <a class="dropdown-item" href="/images"><i class="fa-solid fa-floppy-disk"></i> Image</a>
+    <a class="dropdown-item" href="#"><i class="fa-solid fa-hard-drive"></i> Disks</a>
+    <!-- <a class="dropdown-item" href="#"><i class="fa-solid fa-network-wired"></i> Network</a> -->
+  </div>
+{% endblock %}
+ 
+{% block content %}
+  <div class="container mt-4">
+    <h1><i class="fa-solid fa-network-wired"></i> Network Details</h1>
+
+
+        <!-- Button to open the "Add Network" modal -->
+        <button type="button" class="btn btn-success mb-3" data-toggle="modal" data-target="#addNetworkModal">
+          <i class="fa-solid fa-plus"></i> Add Network
+      </button>
+
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Network Name</th>
+          <th>Driver</th>
+          <th>Connected Containers</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="networkTableBody">
+        <!-- Network details will be dynamically added here using JS -->
+      </tbody>
+    </table>
+  </div>
+
+
+  <!-- Modal for adding network -->
+<div class="modal fade" id="addNetworkModal" tabindex="-1" role="dialog" aria-labelledby="addNetworkModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addNetworkModalLabel"><i class="fa-solid fa-network-wired"></i> Add Network</h5>
+      </div>
+      <div class="modal-body">
+        <label for="networkName">Network Name:</label>
+        <input type="text" class="form-control" autocomplete="off"  id="networkName" required>
+        
+        <label for="subnet">Subnet:</label>
+        <input type="text" class="form-control" id="subnet" placeholder="e.g., 172.20.0.0/16">
+        
+        <label for="gateway">Gateway:</label>
+        <input type="text" class="form-control" id="gateway"  placeholder="e.g., 172.20.0.1">
+        
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="internal">
+          <label class="form-check-label" for="internal">Internal Network</label>
+        </div>
+        
+        <label for="driver">Driver:</label>
+        <input type="text" class="form-control"  id="driver" placeholder="e.g., bridge">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="addNetwork()">Add Network</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Modal for network inspection -->
+  <div class="modal fade" id="networkInspectModal" tabindex="-1" role="dialog" aria-labelledby="networkInspectModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="networkInspectModalLabel"><i class="fa-solid fa-ethernet"></i> Inspect Network</h5>
+        </div>
+        <div class="modal-body" id="networkInspectContent">
+          <!-- Network details will be dynamically added here using JS -->
+        </div>
+        <div class="modal-footer">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Container Modal -->
+<div class="modal fade" id="addContainerModal" tabindex="-1" role="dialog" aria-labelledby="addContainerModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addContainerModalLabel"><i class="fa-solid fa-plus"></i> Add Container to Network</h5>
+        </div>
+        <div class="modal-body">
+          <label for="containerDropdown">Select Container:</label>
+          <select class="form-control" id="containerDropdown"></select>
+          <input type="hidden" id="selectedNetworkId">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" onclick="addContainerToNetwork()">Add Container</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+
+{% endblock %}
