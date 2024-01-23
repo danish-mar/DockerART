@@ -237,6 +237,9 @@
   
 
   <script>
+
+
+    
     // JavaScript for dynamically populating network details
     // JavaScript for dynamically populating network details
     function populateNetworkTable(networks) {
@@ -568,10 +571,13 @@ function deleteNetwork(networkID) {
         .then(result => {
             // Close the modal
             $('#addNetworkModal').modal('hide');
+          // Force a complete refresh, fetching the latest content from the server
+
 
             // Display a toast with the result
             showColorPaletteToast(result.network_id ? 'Network added successfully' : result.error, result.network_id ? 'success' : 'error');
-        })
+
+          })
         .catch(error => {
             console.error('Error adding network:', error);
             showColorPaletteToast('Error adding network. Please try again.', 'error');
