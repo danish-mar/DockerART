@@ -86,6 +86,7 @@ def login():
         if data.get('username') == username and data.get('password') == password:
             # Set a session variable with a random session token
             session['session_token'] = str(random.randint(1, 1000000))
+            print(session['session_token'])
             session['user_id'] = 'keqing'  # Use a unique identifier for the user
 
             return jsonify({'status': 'success'}), 200
@@ -338,6 +339,68 @@ def network_route():
 def get_detailed_docker_networks_route():
     network_details = get_docker_network_details()
     return jsonify(network_details)
+
+
+@app.route('/api/docker-manage/network/getNetworkDetail', methods=['POST'])
+def get_network_details_route():
+    try:
+        data = request.get_json()
+        network_id = data.get('network_id')
+
+        if network_id:
+            result = get_network_details(network_id)
+            return jsonify(result)
+        else:
+            return jsonify({'error': 'Missing network_id in the request body'}), 400
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/docker-manage/network/delete', methods=['POST'])
+def delete_docker_network_route():
+    try:
+        data = request.get_json()
+        network_id = data.get('network_id')
+
+        if network_id:
+            result = delete_docker_network(network_id)
+            return jsonify(result)
+        else:
+            return jsonify({'status': 'error', 'message': 'Missing network_id in the request body'}), 400
+
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+
+# Flask route to disconnect a container from a network
+@app.route('/api/docker-manage/network/disconnect-container', methods=['POST'])
+def disconnect_container_route():
+    data = request.get_json()
+    container_name = data.get('container_name')
+    network_name = data.get('network_name')
+
+    if not container_name or not network_name:
+        return jsonify({'status': 'error', 'message': 'Container name and network name are required'}), 400
+
+    result = disconnect_container_from_network(container_name, network_name)
+    return jsonify(result)
+
+
+
+@app.route('/api/docker-manage/network/connect-container', methods=['POST'])
+def connect_container_route():
+    data = request.get_json()
+
+    container_name = data.get('container_name')
+    network_name = data.get('network_name')
+
+    if container_name and network_name:
+        result = connect_container_to_network(container_name, network_name)
+        return jsonify(result)
+    else:
+        return jsonify({'error': 'Missing container_name or network_name in the request body'}), 400
+
+
 
 
 if __name__ == '__main__':

@@ -1,25 +1,199 @@
-{%extends 'layout.html'%}
+{% extends 'layout.html' %}
 
-{%block customHead%}
+{% block customHead %}
+  <!-- Include jQuery library -->
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+  <!-- Include Bootstrap JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    /* Custom modal styles */
+    .modal-content {
+      background-color: #141827; /* Set background color */
+      color: #BDBCC8; /* Set text color */
+    }
+  
+    .modal-header {
+      background-color: #36406B; /* Set header background color */
+      color: #BDBCC8; /* Set header text color */
+    }
+  
+    .modal-footer {
+      background-color: #36406B; /* Set footer background color */
+      color: #BDBCC8; /* Set footer text color */
+    }
+  
+    /* Customize close button color */
+    .btn-close {
+      color: #BDBCC8;
+    }
 
 
-{%endblock%}
+      /* Custom modal styles */
+  .modal-content {
+    background-color: #141827; /* Set background color */
+    color: #BDBCC8; /* Set text color */
+    border: 1px solid #BDBCC8; /* Add border */
+  }
 
-{%block title%}Network ● DockerART{%endblock%}
+  .modal-header {
+    background-color: #36406B; /* Set header background color */
+    color: #BDBCC8; /* Set header text color */
+    border-bottom: 1px solid #BDBCC8; /* Add border to header */
+  }
 
-{%block menubar%}
+  .modal-footer {
+    background-color: #36406B; /* Set footer background color */
+    color: #BDBCC8; /* Set footer text color */
+    border-top: 1px solid #BDBCC8; /* Add border to footer */
+  }
 
-<div class="dropdown-menu xnavbar" aria-labelledby="manageDropdown">
+  /* Customize close button color */
+  .btn-close {
+    color: #BDBCC8;
+  }
+
+  /* Set table styles */
+  .table {
+    color: white; /* Set font color */
+  }
+
+  .table-bordered {
+    border: 1px solid #BDBCC8; /* Add border to the table */
+  }
+
+  </style>
+  
+{% endblock %}
+
+{% block title %}Network ● DockerART{% endblock %}
+
+{% block menubar %}
+  <div class="dropdown-menu xnavbar" aria-labelledby="manageDropdown">
     <a class="dropdown-item" href="/container"><i class="fa-solid fa-cube"></i> Container</a>
     <a class="dropdown-item" href="/images"><i class="fa-solid fa-floppy-disk"></i> Image</a>
     <a class="dropdown-item" href="#"><i class="fa-solid fa-hard-drive"></i> Disks</a>
-    <!-- <a class="dropdown-item" href="#"><i class="fa-solid fa-network-wired"></i> Network</a> -->
-</div>
+    <a class="dropdown-item" href="#"><i class="fa-solid fa-network-wired"></i> Network</a>
+  </div>
+{% endblock %}
+ 
+{% block content %}
+  <div class="container mt-4">
+    <h1><i class="fa-solid fa-network-wired"></i> Network Details</h1>
 
-{%endblock%}
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Network Name</th>
+          <th>Driver</th>
+          <th>Connected Containers</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="networkTableBody">
+        <!-- Network details will be dynamically added here using JS -->
+      </tbody>
+    </table>
+  </div>
 
-{%block content%}
+  <!-- Modal for network inspection -->
+  <div class="modal fade" id="networkInspectModal" tabindex="-1" role="dialog" aria-labelledby="networkInspectModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="networkInspectModalLabel"><i class="fa-solid fa-ethernet"></i> Inspect Network</h5>
+        </div>
+        <div class="modal-body" id="networkInspectContent">
+          <!-- Network details will be dynamically added here using JS -->
+        </div>
+        <div class="modal-footer">
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <script>
+    // JavaScript for dynamically populating network details
+    function populateNetworkTable(networks) {
+      const tableBody = document.getElementById('networkTableBody');
 
+      networks.forEach(network => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${network.network_name}</td>
+          <td>${network.driver}</td>
+          <td>${network.connected_containers.join(', ')}</td>
+          <td>
+            <button class="btn btn-danger" onclick="deleteNetwork('${network.network_id}')">
+              <i class="fa-solid fa-trash"></i> Delete
+            </button>
+            <button class="btn btn-primary" onclick="inspectNetwork('${network.network_id}')">
+              <i class="fa-solid fa-eye"></i> Inspect
+            </button>
+          </td>
+        `;
 
-{%endblock%}
+        tableBody.appendChild(row);
+      });
+    }
+
+    // JavaScript for dynamically populating network inspection modal
+    function populateNetworkInspectModal(networkDetails) {
+      const modalContent = document.getElementById('networkInspectContent');
+      modalContent.innerHTML = `
+        <p><strong>Network Name:</strong> ${networkDetails.network_name}</p>
+        <p><strong>Network Subnet:</strong> ${networkDetails.network_subnet}</p>
+        <p><strong>Network Gateway:</strong> ${networkDetails.network_gateway}</p>
+        <p><strong>Connected Containers:</strong></p>
+        <ul>
+          ${networkDetails.connected_containers.map(container => `
+            <li>
+              <strong>Container Name:</strong> ${container.container_name}<br>
+              <strong>MAC Address:</strong> ${container.mac_address}<br>
+              <strong>IPv4 Address:</strong> ${container.ipv4_address || 'None'}<br>
+              <strong>IPv6 Address:</strong> ${container.ipv6_address || 'None'}
+            </li>
+          `).join('')}
+        </ul>
+      `;
+    }
+
+    // Function to inspect a network
+    function inspectNetwork(networkId) {
+      // Fetch network details using AJAX or fetch API
+      fetch('/api/docker-manage/network/getNetworkDetail', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ network_id: networkId }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Populate the network inspection modal
+        populateNetworkInspectModal(data);
+        // Show the modal
+        $('#networkInspectModal').modal('show');
+      })
+      .catch(error => console.error('Error:', error));
+    }
+
+    // Function to delete a network
+    function deleteNetwork(networkId) {
+      // Implement network deletion logic here
+      console.log('Deleting network with ID:', networkId);
+    }
+
+    // Function to disconnect a container from a network
+    function disconnectContainer(containerName, networkName) {
+      // Implement container disconnection logic here
+      console.log(`Disconnecting container ${containerName} from network ${networkName}`);
+    }
+
+    // Fetch and populate network details on page load
+    fetch('/api/docker-manage/network/getDetailedNetwork')
+      .then(response => response.json())
+      .then(data => populateNetworkTable(data))
+      .catch(error => console.error('Error:', error));
+  </script>
+{% endblock %}
