@@ -249,7 +249,7 @@ def delete_docker_container_route():
 
 
 @app.route('/api/docker-manage/createNetwork', methods=['POST'])
-def create_docker_network_route():
+def Xcreate_docker_network_route():
     data = request.get_json()
 
     # Extract parameters from the request data
@@ -400,7 +400,23 @@ def connect_container_route():
     else:
         return jsonify({'error': 'Missing container_name or network_name in the request body'}), 400
 
+@app.route('/api/docker-manage/network/create', methods=['POST'])
+def create_docker_network_route():
+    try:
+        data = request.get_json()
+        network_name = data.get('network_name')
+        ipam_config = data.get('ipam_config')
+        internal = data.get('internal', False)
+        driver = data.get('driver', 'bridge')
 
+        if network_name:
+            result = create_docker_network(network_name, ipam_config, internal, driver)
+            return jsonify(result)
+        else:
+            return jsonify({'error': 'Missing network_name in the request body'}), 400
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 if __name__ == '__main__':
