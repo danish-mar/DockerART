@@ -406,6 +406,31 @@ def pull_docker_image(image_name, tag='latest'):
         # Return an error message if there is an issue with the image pull
         yield f"data: {json.dumps({'status': 'error', 'message': f'Error pulling Docker image: {e}'})}\n\n"
 
+
+def get_docker_network_details():
+    try:
+        client = docker.from_env()
+        networks = client.networks.list()
+
+        network_details_list = []
+
+        for network in networks:
+            network_details = {
+                'network_name': network.name,
+                'network_id': network.id[:12],  # Shortened network ID
+                'connected_containers': [container.name for container in network.containers],
+                'driver': network.attrs['Driver'],
+            }
+
+            network_details_list.append(network_details)
+
+        return network_details_list
+
+    except docker.errors.APIError as e:
+        # Handle Docker API errors
+        return {'error': f'Docker API error: {e}'}
+
+
 # ... (existing code)
 
 

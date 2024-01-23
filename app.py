@@ -322,5 +322,23 @@ def get_random_name():
     name = randomname.generate()
     return jsonify({"random_name": name})
 
+
+
+#network page routes
+
+@app.route('/networks', methods=['GET'])
+def network_route():
+    if check_session():
+        return render_template('networks.html')
+    else:
+        return redirect(url_for('login'))
+
+
+@app.route('/api/docker-manage/network/getDetailedNetwork', methods=['GET'])
+def get_detailed_docker_networks_route():
+    network_details = get_docker_network_details()
+    return jsonify(network_details)
+
+
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0")
