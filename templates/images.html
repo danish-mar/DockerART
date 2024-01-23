@@ -1,20 +1,226 @@
-{%extends 'layout.html'%}
-{%block title%}Images ● DockerART{%endblock%}
+{% extends 'layout.html' %}
+{% block title %}Images ● DockerART{% endblock %}
 
-
-{%block menubar%}
-
+{% block menubar %}
 <div class="dropdown-menu xnavbar" aria-labelledby="manageDropdown">
     <a class="dropdown-item" href="/container"><i class="fa-solid fa-cube"></i> Container</a>
-    <!-- <a class="dropdown-item" href="#"><i class="fa-solid fa-floppy-disk"></i> Image</a> -->
     <a class="dropdown-item" href="#"><i class="fa-solid fa-hard-drive"></i> Disks</a>
     <a class="dropdown-item" href="/networks"><i class="fa-solid fa-network-wired"></i> Network</a>
 </div>
+{% endblock %}
 
+{%block customHead%}
+    <link rel="stylesheet" href="/static/css/imageTable.css">
+    <link rel="stylesheet" href="/static/manage.css">
+    <script src="/static/scripts/docker_endpoit.js"></script>
 {%endblock%}
 
-{%block content%}
+
+{% block content %}
+
+<div class="overlay_pull" id="overlay_pull">
+    <div id="dockerFormPull" class="form-container alert-box">
+        <i class="fa-solid fa-puzzle-piece fa-3x"></i>
+
+        <h1>Pull Docker Image..!</h1>
+        
+        <label for="dockerImage">Docker Image:</label>
+        <input type="text" class="form-control" id="dockerImagePull" name="dockerImagePull" oninput="updateDropdown()">
+
+        <div id="imagePullDropdown"></div>
+
+        <p id="errorMessage" class="error-message"></p>
+        <!-- Add this element to your HTML where you want to display the status line -->
+        <p id="statusLine" class="status-line"></p>
+
+        <p id="successMessage" class="success-message"></p>
+
+        <div id="loader" class="loader"></div>
+
+        <button class="btn btn-success" onclick="initiatePull()">Pull!</button>
+        <button class="btn btn-secondary" onclick="form_pull_docker_image_hide()">Cancel</button>
+    </div>
+</div>
+
+
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control sb" placeholder="Search" id="searchInput" onkeyup="searchImage()">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" onclick="searchImages()">
+                        <i class="fa-solid fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 text-right">
+            <button class="btn btn-success" onclick="form_show_pull_docker_image()">
+                <i class="fa-solid fa-download"></i> Pull
+            </button>
+        </div>
+    </div>
+
+    <table class="table table-unbordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Release Date</th>
+                <th>Size</th>
+                <th>Tags</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="imageTableBody">
+            <!-- Images will be dynamically added here -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Fetch images from the API endpoint
+    fetch("/api/docker-manage/images/list")
+        .then(response => response.json())
+        .then(data => {
+            // Populate the table with images
+            const tableBody = document.getElementById("imageTableBody");
+            data.forEach(image => {
+                const row = `
+                    <tr>
+                        <td>${image.id}</td>
+                        <td>${image.name}</td>
+                        <td>${image.release_date}</td>
+                        <td>${image.size}</td>
+                        <td>${image.tags.join(', ')}</td>
+                        <td>
+                            <button class="btn btn-danger" onclick="deleteImage('${image.id}')">
+                                <i class="fa-solid fa-bin"></i> Delete
+                            </button>
+                        </td>
+                    </tr>`;
+                tableBody.innerHTML += row;
+            });
+        })
+        .catch(error => console.error('Error fetching images:', error));
+
+    // Function to handle image deletion
+    function deleteImage(imageId) {
+        // Add your logic here to handle image deletion
+        console.log('Deleting image with ID:', imageId);
+    }
+
+
+</script>
+
+<script>
+    // Fetch images from the API endpoint
+    fetch("/api/docker-manage/images/list")
+        .then(response => response.json())
+        .then(data => {
+            // Initial population of the table
+            populateTable(data);
+        })
+        .catch(error => console.error('Error fetching images:', error));
+
+    // Function to populate the table with images
+    function populateTable(images) {
+        const tableBody = document.getElementById("imageTableBody");
+        tableBody.innerHTML = ''; // Clear the existing content
+
+        images.forEach(image => {
+            const row = `
+                <tr>
+                    <td>${image.id}</td>
+                    <td>${image.name}</td>
+                    <td>${image.release_date}</td>
+                    <td>${image.size}</td>
+                    <td>${image.tags.join(', ')}</td>
+                    <td>
+                        <button class="btn btn-danger" onclick="deleteImage('${image.id}')">
+                            <i class="fa-solid fa-trash"></i> Delete
+                        </button>
+                    </td>
+                </tr>`;
+            tableBody.innerHTML += row;
+        });
+    }
 
 
 
-{%endblock%}
+
+        // Function to handle image deletion
+        function deleteImage(imageId) {
+            const confirmDelete = confirm("Are you sure you want to delete this image?");
+            if (confirmDelete) {
+                // Make a POST request to the API endpoint
+                fetch("/api/docker-manage/images/delete", {
+                    method: 'DELETE', // Updated to use POST
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ image_id: imageId }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data); // Log the response from the server
+                    // Optionally, you can update the table to reflect the deletion
+                    // For example, fetch images again and repopulate the table
+                    fetch("/api/docker-manage/images/list")
+                        .then(response => response.json())
+                        .then(data => {
+                            tableBody.innerHTML = ''; // Clear the existing content
+                            populateTable(data);
+                        })
+                        .catch(error => console.error('Error fetching images:', error));
+                })
+                .catch(error => console.error('Error deleting image:', error));
+            }
+        }
+    
+        // ... (unchanged code)
+
+    
+
+    
+
+    // Function to handle image search
+    function searchImages() {
+        const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+
+        fetch("/api/docker-manage/images/list")
+            .then(response => response.json())
+            .then(data => {
+                // Filter images based on the search term
+                const filteredImages = data.filter(image => image.name.toLowerCase().includes(searchTerm));
+                
+                // Populate the table with the filtered images
+                populateTable(filteredImages);
+            })
+            .catch(error => console.error('Error fetching images:', error));
+    }
+
+    // Function to handle image download
+    function downloadImages() {
+        // Add your logic here to initiate image download
+        console.log('Downloading images');
+    }
+
+    // Live search: bind searchImages to input event
+    const searchInput = document.getElementById("searchInput");
+    searchInput.addEventListener("input", searchImages);
+</script>
+
+
+<script>
+    function form_show_pull_docker_image(){
+        document.getElementById('overlay_pull').style.display = 'flex';
+    }
+
+    function form_pull_docker_image_hide(){
+        document.getElementById('overlay_pull').style.display = 'none';
+    }
+</script>
+
+{% endblock %}

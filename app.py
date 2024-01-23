@@ -325,12 +325,36 @@ def get_random_name():
 
 
 
+#list images  
+@app.route('/api/docker-manage/images/list', methods=['GET'])
+def get_images():
+    images_info = list_installed_images_detailed()
+    return jsonify(images_info)
+
+@app.route('/api/docker-manage/images/delete', methods=['DELETE'])
+def delete_image_route():
+    if check_session():
+        try:
+            data = request.get_json()
+            image_id = data.get('image_id')
+
+            if image_id:
+                result = delete_image(image_id)
+                return jsonify(result)
+            else:
+                return jsonify({'error': 'Missing image_id in the request body'}), 400
+
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+
+
 #network page routes
 
 @app.route('/networks', methods=['GET'])
 def network_route():
     if check_session():
         return render_template('networks.html')
+
     else:
         return redirect(url_for('login'))
 
@@ -417,6 +441,7 @@ def create_docker_network_route():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 
 if __name__ == '__main__':

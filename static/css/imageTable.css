@@ -1,0 +1,9 @@
+.table{
+    color: white;
+}
+
+.sb{
+    color: white;
+    background-color: black;
+    backdrop-filter: blur(5px);
+}
